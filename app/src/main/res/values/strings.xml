@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AlarmClock</string>
+    <string name="set_alarm">Set alarm</string>
+    <string name="cancel_alarm">Cancel alarm</string>
+    <string name="ring">RING RING RING!!!</string>
+    <string name="alarm_will_ring">Alarm will ring in:</string>
+    <string name="cancel">CANCEL</string>
+    <string name="for_service">foregroundService</string>
+</resources>
