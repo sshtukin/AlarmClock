@@ -4,6 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
+/**
+ * BroadcastReceiver which runs SetAlarmJobService after device reboot
+ *
+ * @author Sergey Shtukin
+ */
+
 class BootCompletedIntentReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {

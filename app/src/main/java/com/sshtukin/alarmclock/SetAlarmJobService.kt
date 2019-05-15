@@ -4,6 +4,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
 
+/**
+ * JobIntentService which sets alarm
+ *
+ * @author Sergey Shtukin
+ */
 
 class SetAlarmJobService : JobIntentService() {
 

@@ -1,12 +1,12 @@
 package com.sshtukin.alarmclock
 
-import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -15,6 +15,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import java.util.*
 
+/**
+ * Foreground service which shows notification, until set time,
+ * than plays ringtone and shows toast
+ *
+ * @author Sergey Shtukin
+ */
 
 class AlarmClockService : Service() {
     private lateinit var notificationManager: NotificationManager
@@ -27,6 +33,7 @@ class AlarmClockService : Service() {
         if (ACTION_STOP_SERVICE == intent?.action) {
             stopAlarmClockService()
         } else {
+            running = true
             notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationBuilder = getNotificationBuilder()
             calendar = calendarFromPreferences(this)
@@ -43,25 +50,32 @@ class AlarmClockService : Service() {
             while (running && (Calendar.getInstance().timeInMillis <= calendar!!.timeInMillis)) {
                 val timeLeft = calendar!!.timeInMillis - Calendar.getInstance().timeInMillis
                 notificationBuilder
-                    .setSmallIcon(com.sshtukin.alarmclock.R.drawable.ic_launcher_background)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
                     .setContentText((timeLeft / MINUTE + 1).toString() + " minute(s)")
                 notificationManager.notify(FOREGROUND_ID, notificationBuilder.build())
-                Thread.sleep(MINUTE)
+                if (timeLeft > MINUTE) {
+                    Thread.sleep(MINUTE)
+                } else {
+                    Thread.sleep(timeLeft)
+                }
             }
-            showToast()
+            ring()
             stopAlarmClockService()
         }).start()
     }
 
-    private fun showToast() {
+    private fun ring() {
         val mainHandler = Handler(mainLooper)
         mainHandler.post {
             Toast.makeText(
                 applicationContext,
-                getString(com.sshtukin.alarmclock.R.string.ring),
+                getString(R.string.ring),
                 Toast.LENGTH_SHORT
             ).show()
         }
+
+        val player = MediaPlayer.create(this, R.raw.song)
+        player.start()
     }
 
     private fun stopAlarmClockService() {
@@ -74,17 +88,17 @@ class AlarmClockService : Service() {
         val stopSelfPendingIntent = PendingIntent.getService(this, 0, stopSelfIntent, 0)
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(
-                getString(com.sshtukin.alarmclock.R.string.for_service),
-                getString(com.sshtukin.alarmclock.R.string.for_service)
+                getString(R.string.for_service),
+                getString(R.string.for_service)
             )
         } else {
             ""
         }
         return NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(com.sshtukin.alarmclock.R.drawable.ic_launcher_background)
-            .setContentTitle(getString(com.sshtukin.alarmclock.R.string.alarm_will_ring))
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle(getString(R.string.alarm_will_ring))
             .addAction(
-                R.drawable.ic_delete, getString(com.sshtukin.alarmclock.R.string.cancel),
+                R.drawable.ic_launcher_background, getString(R.string.cancel),
                 stopSelfPendingIntent
             )
     }

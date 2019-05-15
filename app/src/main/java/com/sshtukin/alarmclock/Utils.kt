@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.preference.PreferenceManager
 import java.util.*
 
@@ -19,6 +20,18 @@ fun startAlarm(context: Context, calendar: Calendar?) {
             DAY,
             pendingIntent
         )
+        if ((calendar.timeInMillis - 5 * MINUTE) > Calendar.getInstance().timeInMillis) {
+            startAlarmService(context)
+        }
+    }
+}
+
+fun startAlarmService(context: Context) {
+    val serviceIntent = Intent(context, AlarmClockService::class.java)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        context.startForegroundService(serviceIntent)
+    } else {
+        context.startService(serviceIntent)
     }
 }
 
